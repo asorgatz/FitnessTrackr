@@ -25,7 +25,7 @@ async function createUser({ username, password }) {
 async function getUser({ username, password }) {
   try {
     const {rows: [user]} = await client.query(`
-      SELECT * FROM users 
+      SELECT id, username FROM users 
       WHERE username = $1 
       AND password = $2
     `, [username, password])
@@ -38,9 +38,8 @@ async function getUser({ username, password }) {
 async function getUserById(userId) {
   try {
     const {rows: [user]} = await client.query(`
-      SELECT * FROM users 
+      SELECT id, username FROM users 
       WHERE id=$1
-      // RETURNING id, username
     `, [userId])
     return user
   } catch (error) {
