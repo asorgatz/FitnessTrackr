@@ -4,7 +4,7 @@ DO NOT CHANGE THIS FILE
 
 */
 require("dotenv").config();
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const faker = require("faker");
 const client = require("../../db/client");
 const {
@@ -136,7 +136,7 @@ xdescribe("DB Users", () => {
         `,
         [user.id]
       );
-      const hashedVersion = await bcryptjs.compare(
+      const hashedVersion = await bcrypt.compare(
         fakeUserData.password,
         queriedUser.password
       );
