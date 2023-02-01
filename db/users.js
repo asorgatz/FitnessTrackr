@@ -10,7 +10,7 @@ async function createUser({ username, password }) {
       INSERT INTO users(username, password) 
       VALUES($1, $2) 
       ON CONFLICT (username) DO NOTHING 
-      RETURNING *;
+      RETURNING id, username;
     `, [username, password]);
         
     return user;
@@ -24,9 +24,12 @@ async function createUser({ username, password }) {
 
 async function getUser({ username, password }) {
   try {
-    const {rows} = await client.query(`
-      SELECT * FROM users WHERE username = $1 AND password = $2
+    const {rows: [user]} = await client.query(`
+      SELECT * FROM users 
+      WHERE username = $1 
+      AND password = $2
     `, [username, password])
+    return user
   } catch (error) {
     throw error
   }
@@ -34,27 +37,26 @@ async function getUser({ username, password }) {
 
 async function getUserById(userId) {
   try {
-    const {rows} = await client.query(`
-      SELECT * FROM users WHERE id = $1
-      RETURNING id, username
+    const {rows: [user]} = await client.query(`
+      SELECT * FROM users 
+      WHERE id=$1
+      // RETURNING id, username
     `, [userId])
-    const user = rows[0]
     return user
   } catch (error) {
-    console.error
+    throw error
   }
 }
 
 async function getUserByUsername(userName) {
   try {
-    const {rows} = await client.query(`
-      SELECT * FROM users WHERE username = $1
-      RETURNING *
+    const {rows: [user]} = await client.query(`
+      SELECT * FROM users 
+      WHERE username=$1
     `, [userName])
-    const user = rows[0]
     return user
   } catch (error) {
-    console.error
+    throw error
   }
 }
 

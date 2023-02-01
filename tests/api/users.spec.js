@@ -8,7 +8,7 @@ const request = require("supertest");
 const faker = require("faker");
 const client = require("../../db/client");
 const app = require("../../app");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const {
   createFakeUserWithToken,
@@ -92,7 +92,7 @@ describe("/api/users", () => {
       // The original password and the hashedPassword shouldn't be the same
       expect(fakeUserData.password).not.toBe(hashedPassword);
       // Bcrypt.compare should return true.
-      expect(await bcrypt.compare(fakeUserData.password, hashedPassword)).toBe(
+      expect(await bcryptjs.compare(fakeUserData.password, hashedPassword)).toBe(
         true
       );
     });
