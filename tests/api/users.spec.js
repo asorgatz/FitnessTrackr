@@ -8,7 +8,7 @@ const request = require("supertest");
 const faker = require("faker");
 const client = require("../../db/client");
 const app = require("../../app");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {
   createFakeUserWithToken,
