@@ -120,7 +120,7 @@ async function getPublicRoutinesByUser({ username }) {
 }
 
 
-}
+
 
 async function getPublicRoutinesByActivity({ id }) {
   try {
