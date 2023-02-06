@@ -1,4 +1,5 @@
 const client = require("./client");
+const { attachActivitiesToRoutines } = require("./activities")
 
 async function createRoutine({ creatorId, isPublic, name, goal }) {
   try {
@@ -44,34 +45,16 @@ async function getRoutinesWithoutActivities() {
 async function getAllRoutines() {
   try {
     const {rows} = await client.query(`
-    SELECT routines.*, routine_activities.duration, routine_activities.count, activities.id AS "activityId", activities.name  AS "activityName", description, username AS "creatorName"
+    SELECT routines.*, count, duration, activities.name as "activityName", activities.id as "activityId", description, username as "creatorName", routine_activities.id as "routineActivityId"  
     FROM routines
-    JOIN routine_activities ON routines.id = routine_activities."routineId"
-    JOIN activities ON activities.id = routine_activities."activityId"
-    JOIN users ON users.id = routines."creatorId"
+     JOIN routine_activities ON routines.id = routine_activities."routineId"
+     JOIN activities ON activities.id = routine_activities."activityId"
+     JOIN users ON "creatorId" = users.id
       `)
-    console.log(rows)
-    const allRoutines = {}
-    rows.forEach( row => {
-      allRoutines[row.id] = {
-        id: row.id,
-        creatorId: row.creatorId,
-        isPublic: row.isPublic,
-        name: row.name,
-        goal: row.goal,
-        activities: {
-
-          duration: row.duration,
-
-        }
-
-
-
-      }
-    })
-
-
-    return rows
+    let allRoutines = await attachActivitiesToRoutines(rows)
+    allRoutines = Object.values(allRoutines)
+    console.log(allRoutines)
+    return allRoutines
   } catch (error) {
     throw error
   }
@@ -99,7 +82,6 @@ async function updateRoutine({ id, ...fields }) {
   const setString = Object.keys(fields).map(
     (key, index) => `"${ key }"=$${ index + 1 }`
   ).join(', ');
-    console.log(setString)
   try {
     const {rows: [activity]} = await client.query(`
     UPDATE routines
