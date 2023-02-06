@@ -71,7 +71,6 @@ async function getAllPublicRoutines() {
     `)
   let publicRoutines = await attachActivitiesToRoutines(rows)
   publicRoutines = Object.values(publicRoutines)
-  console.log(publicRoutines)
   return publicRoutines
 } catch (error) {
   throw error
@@ -80,29 +79,67 @@ async function getAllPublicRoutines() {
 async function getAllRoutinesByUser({ username }) {
   try {
     const {rows} = await client.query(`
-    SELECT routines.*, count, duration, activities.name as "activityName", activities.id as "activityId", description, username as "creatorName", routine_activities.id as "routineActivityId"  
-    FROM routines
-     JOIN routine_activities ON routines.id = routine_activities."routineId"
-     JOIN activities ON activities.id = routine_activities."activityId"
-     JOIN users ON "creatorId" = users.id
-     WHERE username=$1;
-      `,[username])
-    let allRoutinesByUser = await attachActivitiesToRoutines(rows)
-    allRoutinesByUser = Object.values(allRoutinesByUser)
-    console.log(allRoutinesByUser)
-    return allRoutinesByUser
+      SELECT routines.*, count, duration, activities.name as "activityName", activities.id as "activityId", description, username as "creatorName", routine_activities.id as "routineActivityId"  
+      FROM routines
+        JOIN routine_activities ON routines.id = routine_activities."routineId"
+        JOIN activities ON activities.id = routine_activities."activityId"
+        JOIN users ON "creatorId" = users.id
+      WHERE username=$1
+    `, [username])
+  let routinesByUser = await attachActivitiesToRoutines(rows)
+  routinesByUser = Object.values(routinesByUser)
+  
+  return routinesByUser
   } catch (error) {
     throw error
   }
 
 
 
+}
+
+async function getPublicRoutinesByUser({ username }) {
+  try {
+    const {rows} = await client.query(`
+      SELECT routines.*, count, duration, activities.name as "activityName", activities.id as "activityId", description, username as "creatorName", routine_activities.id as "routineActivityId"  
+      FROM routines
+        JOIN routine_activities ON routines.id = routine_activities."routineId"
+        JOIN activities ON activities.id = routine_activities."activityId"
+        JOIN users ON "creatorId" = users.id
+      WHERE "isPublic"=true
+      AND username=$1
+    `, [username])
+  let publicRoutinesByUser = await attachActivitiesToRoutines(rows)
+  publicRoutinesByUser = Object.values(publicRoutinesByUser)
+  return publicRoutinesByUser
+    
+  } catch (error) {
+    throw error
+  }
 
 }
 
-async function getPublicRoutinesByUser({ username }) {}
 
-async function getPublicRoutinesByActivity({ id }) {}
+}
+
+async function getPublicRoutinesByActivity({ id }) {
+  try {
+    const {rows} = await client.query(`
+      SELECT routines.*, count, duration, activities.name as "activityName", activities.id as "activityId", description, username as "creatorName", routine_activities.id as "routineActivityId"  
+      FROM routines
+        JOIN routine_activities ON routines.id = routine_activities."routineId"
+        JOIN activities ON activities.id = routine_activities."activityId"
+        JOIN users ON "creatorId" = users.id
+      WHERE "isPublic"=true
+      AND activities.id=$1
+      `, [id])
+    let publicRoutines = await attachActivitiesToRoutines(rows)
+    publicRoutines = Object.values(publicRoutines)
+    return publicRoutines
+  } catch (error) {
+    throw error
+  }
+}
 
 async function updateRoutine({ id, ...fields }) {
   const setString = Object.keys(fields).map(
@@ -121,7 +158,14 @@ async function updateRoutine({ id, ...fields }) {
   }
 }
 
-async function destroyRoutine(id) {}
+async function destroyRoutine(id) {
+  try {
+
+  } catch (error) {
+    throw error
+  }
+
+}
 
 module.exports = {
   getRoutineById,
