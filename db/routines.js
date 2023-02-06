@@ -120,7 +120,7 @@ async function getPublicRoutinesByUser({ username }) {
 }
 
 
-}
+
 
 async function getPublicRoutinesByActivity({ id }) {
   try {
@@ -160,7 +160,14 @@ async function updateRoutine({ id, ...fields }) {
 
 async function destroyRoutine(id) {
   try {
-
+    const {rows: ra} = await client.query(`
+    DELETE FROM routine_activities
+    WHERE "routineId"=$1;
+  `, [id])
+  const {rows: routines} = await client.query(`
+    DELETE FROM routines
+    WHERE id=$1;
+  `, [id])
   } catch (error) {
     throw error
   }
