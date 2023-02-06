@@ -111,7 +111,6 @@ async function getPublicRoutinesByUser({ username }) {
     `, [username])
   let publicRoutinesByUser = await attachActivitiesToRoutines(rows)
   publicRoutinesByUser = Object.values(publicRoutinesByUser)
-  console.log(publicRoutinesByUser)
   return publicRoutinesByUser
     
   } catch (error) {
