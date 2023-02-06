@@ -90,10 +90,10 @@ async function getAllRoutinesByUser({ username }) {
   routinesByUser = Object.values(routinesByUser)
   
   return routinesByUser
-    
   } catch (error) {
     throw error
   }
+
 
 
 }
@@ -116,6 +116,8 @@ async function getPublicRoutinesByUser({ username }) {
   } catch (error) {
     throw error
   }
+
+}
 
 
 }
