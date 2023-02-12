@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
 const { tr } = require("faker/lib/locales");
-const { createUser } = require("../db");
+const { createUser, getUserByUsername } = require("../db");
 const router = express.Router();
 
 
@@ -10,16 +10,30 @@ const router = express.Router();
 router.post('/register', async (req, res, next) => {
     try {
         const {username, password } = req.body
-        
-        
-        const register = await createUser({ username, password })
 
+        
+        const user = await createUser({ username, password })
+        
+        if (!user){
+            res.send({
+                error: "Username Taken",
+                message: `User ${username} is already taken.`,
+                name: "Username Taken"
+            })
+        }
+        if (password.length<8){
+            res.send({
+                error: "Password Too Short!",
+                message: "Password Too Short!",
+                name: "Password Too Short!"
+            })
+        }
         const response = {
             message: "Registered",
             token: "TBD",
             user: {
-                id: register.id,
-                username: register.username
+                id: user.id,
+                username: user.username
             }
         }
         
