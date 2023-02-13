@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 const express = require("express");
 const { tr } = require("faker/lib/locales");
-const { createUser, getUserByUsername, getUserById } = require("../db");
+const { createUser, getUserByUsername, getUserById, getAllRoutinesByUser, getPublicRoutinesByUser } = require("../db");
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
@@ -78,7 +78,6 @@ router.get('/me', async (req, res, next) => {
     
     const prefix = 'Bearer ';
     const auth = req.header('Authorization')
-    console.log(auth)
 
     if(!auth) {
         next(res.status(401).send({
@@ -108,5 +107,51 @@ router.get('/me', async (req, res, next) => {
 })
 
 // GET /api/users/:username/routines
+
+router.get('/:username/routines', async (req, res, next) => {
+    const {username} = req.params
+    const prefix = 'Bearer ';
+    const auth = req.header('Authorization')
+    const token = auth.slice(prefix.length);
+    
+    const { id } = jwt.verify(token, JWT_SECRET);
+    console.log(id)
+    const localUser = await getUserById(id)
+    console.log(localUser)
+
+    if(!auth) {
+        next(res.status(401).send({
+            error:"Invalid Token",
+            message:"You must be logged in to perform this action",
+            name:"Invalid Token"
+        }));
+    } else if (auth.startsWith(prefix)) {
+        try{
+            if (username === localUser.username) {
+                const routines = await getAllRoutinesByUser({username})
+                console.log(username, localUser.username)
+                res.send(routines)
+            } else {
+                const publicRoutines = await getPublicRoutinesByUser({username})
+                console.log("proutines", publicRoutines)
+                res.send(publicRoutines)
+            }
+        } catch (error) {
+            throw error
+        }
+    } else {
+        next({
+            name: 'AuthorizationHeaderError',
+            message: `Authorization token must start with ${ prefix }`
+        });
+    }
+
+    // try{
+    //     const routines = await getAllRoutinesByUser(username)
+    //     res.send(routines)
+    // } catch {
+    //     throw error
+    // }
+})
 
 module.exports = router;

@@ -88,7 +88,6 @@ async function getAllRoutinesByUser({ username }) {
     `, [username])
   let routinesByUser = await attachActivitiesToRoutines(rows)
   routinesByUser = Object.values(routinesByUser)
-  
   return routinesByUser
   } catch (error) {
     throw error
